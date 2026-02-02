@@ -29,7 +29,7 @@ RUN ./mvnw -B dependency:go-offline
 
 # Copy source and build native
 COPY src ./src
-RUN ./mvnw package -Pnative -Dquarkus.native.native-image-xmx=12G -DskipTests
+RUN ./mvnw package -Pnative -DskipTests
 
 # -------- Runtime stage --------
 FROM quay.io/quarkus/ubi9-quarkus-micro-image:2.0
