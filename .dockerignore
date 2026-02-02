@@ -6,6 +6,6 @@
 !target/lib/*
 !target/quarkus-app/*
 
-# Uncomment these for native build
+# These are needed in native builds
 !mvnw
 !.mvn/
