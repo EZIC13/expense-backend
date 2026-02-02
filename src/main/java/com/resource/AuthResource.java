@@ -73,7 +73,7 @@ public class AuthResource {
     @Path("/current-user")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCurrentUser(@CookieParam("budget_session") String token) {
-        if (token == null) {
+        if (token == null || token.isBlank()) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -95,7 +95,7 @@ public class AuthResource {
 
         String username = session.user.username;
         return Response.ok(Map.of(
-                "username", username
+            "username", username
         )).build();
     }
 

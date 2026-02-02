@@ -5,3 +5,7 @@
 !target/*-runner.jar
 !target/lib/*
 !target/quarkus-app/*
+
+# Uncomment these for native build
+!mvnw
+!.mvn/

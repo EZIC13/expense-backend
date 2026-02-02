@@ -1,16 +1,40 @@
-FROM maven:3.9.7-eclipse-temurin-21 AS build
-WORKDIR /workspace
+# JVM BUILD
+#FROM maven:3.9.7-eclipse-temurin-21 AS build
+#WORKDIR /workspace
+#
+#COPY pom.xml .
+#COPY src ./src
+#
+#RUN mvn -e -DskipTests package
+#
+#FROM eclipse-temurin:21-jre-jammy
+#WORKDIR /app
+#
+#COPY --from=build /workspace/target/quarkus-app /app
+#
+#EXPOSE 8080
+#
+#CMD ["java", "-jar", "/app/quarkus-run.jar"]
 
+# NATIVE BUILD
+# -------- Build stage (native) --------
+FROM quay.io/quarkus/ubi9-quarkus-mandrel-builder-image:jdk-21 AS build
+WORKDIR /code
+
+# Copy and run the Maven wrapper
+COPY mvnw ./
+COPY .mvn .mvn
 COPY pom.xml .
+RUN ./mvnw -B dependency:go-offline
+
+# Copy source and build native
 COPY src ./src
+RUN ./mvnw package -Pnative -Dquarkus.native.native-image-xmx=12G -Dquarkus.native.additional-build-args="-H:Threads=8" -Dquarkus.native.container-build=true -DskipTests
 
-RUN mvn -e -DskipTests package
-
-FROM eclipse-temurin:21-jre-jammy
+# -------- Runtime stage --------
+FROM quay.io/quarkus/ubi9-quarkus-micro-image:2.0
 WORKDIR /app
-
-COPY --from=build /workspace/target/quarkus-app /app
+COPY --from=build /code/target/*-runner /app/application
 
 EXPOSE 8080
-
-CMD ["java", "-jar", "/app/quarkus-run.jar"]
+ENTRYPOINT ["/app/application"]
