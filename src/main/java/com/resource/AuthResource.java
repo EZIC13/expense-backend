@@ -5,7 +5,12 @@ import com.model.Session;
 import com.model.User;
 import com.model.UserCreateRequest;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.*;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.CookieParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
@@ -17,7 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Map;
 
-@Path("/auth2")
+@Path("/auth")
 public class AuthResource {
 
     @ConfigProperty(name = "api_env")
