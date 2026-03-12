@@ -36,13 +36,13 @@ public class AuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response loginUser(final LoginRequest request) {
-        User user = User.find("username", request.username).firstResult();
+        User user = User.find("username", request.username()).firstResult();
 
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        if (!request.username.equals(user.username) || !BCrypt.checkpw(request.password, user.password)) {
+        if (!BCrypt.checkpw(request.password(), user.password)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -53,23 +53,24 @@ public class AuthResource {
         final String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randombytes);
 
         //todo make an AuthService to handle session crud ops
-        Session session = new Session();
-        session.token = token;
-        session.expires = Instant.now().plus(1, ChronoUnit.DAYS);
-        session.user = user;
+        Session session = new Session(
+            token,
+            Instant.now().plus(1, ChronoUnit.DAYS),
+            user
+        );
         session.persist();
 
         //todo this will also be in AuthService
         boolean secure_cookie = !api_env.equals("dev");
         NewCookie cookie = new NewCookie.Builder("budget_session")
-                .value(token)
-                .path("/")
-                .domain(domain)
-                .httpOnly(true)
-                .secure(secure_cookie)
-                .sameSite(NewCookie.SameSite.NONE)
-                .maxAge(24 * 60 * 60) //one day
-                .build();
+            .value(token)
+            .path("/")
+            .domain(domain)
+            .httpOnly(true)
+            .secure(secure_cookie)
+            .sameSite(NewCookie.SameSite.NONE)
+            .maxAge(24 * 60 * 60) //one day
+            .build();
 
         return Response.ok().cookie(cookie).build();
     }
@@ -83,7 +84,7 @@ public class AuthResource {
         }
 
         Session session = Session.find("token", token).firstResult();
-        if (session == null || session.expires.isBefore(Instant.now())) {
+        if (session == null || session.getExpires().isBefore(Instant.now())) {
             boolean secure_cookie = !api_env.equals("dev");
             NewCookie deleteCookie = new NewCookie.Builder("budget_session")
                     .value("")
@@ -98,7 +99,7 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
         }
 
-        String username = session.user.username;
+        String username = session.getUser().username;
         return Response.ok(Map.of(
             "username", username
         )).build();

@@ -1,8 +1,14 @@
 package com.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
 import java.time.Instant;
 
 @Entity
@@ -11,15 +17,33 @@ public class Session extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    public String id;
+    @Column(name = "id")
+    private String id;
 
-    public String token;
-    public Instant expires;
+    @Column(name = "token")
+    private String token;
+
+    @Column(name = "expires")
+    private Instant expires;
 
     @ManyToOne
-    public User user;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Session() {}
 
-    //todo make properties private and add getters and setters
+    public Session(String token, Instant expires, User user) {
+        this.token = token;
+        this.expires = expires;
+        this.user = user;
+    }
+
+    public String getId() { return id; }
+    public String getToken() { return token; }
+    public Instant getExpires() { return expires; }
+    public User getUser() { return user; }
+
+    public void setToken(String token) { this.token = token; }
+    public void setExpires(Instant expires) { this.expires = expires; }
+    public void setUser(User user) { this.user = user; }
 }
