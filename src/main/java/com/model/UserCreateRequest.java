@@ -1,6 +1,3 @@
 package com.model;
 
-public class UserCreateRequest {
-    public String username;
-    public String password;
-}
+public record UserCreateRequest (String username, String password) {}

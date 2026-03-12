@@ -1,7 +1,12 @@
 package com.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
 
 @Entity
 @Table(name = "users")
@@ -11,10 +16,23 @@ public class User extends PanacheEntityBase {
     @GeneratedValue(strategy = GenerationType.UUID)
     public String id;
 
-    public String username;
-    public String password;
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "password")
+    private String password;
 
     public User() {}
 
-    //todo make properties private and add getters and setters
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
+    public String getId() { return id; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
 }

@@ -42,7 +42,7 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        if (!BCrypt.checkpw(request.password(), user.password)) {
+        if (!BCrypt.checkpw(request.password(), user.getPassword())) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -99,7 +99,7 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
         }
 
-        String username = session.getUser().username;
+        String username = session.getUser().getUsername();
         return Response.ok(Map.of(
             "username", username
         )).build();
@@ -111,9 +111,10 @@ public class AuthResource {
     @Transactional
     public Response createUser(final UserCreateRequest request) {
         //todo make a UserService to handle user crud ops
-        User user = new User();
-        user.username = request.username;
-        user.password = BCrypt.hashpw(request.password, BCrypt.gensalt());
+        User user = new User(
+            request.username(),
+            BCrypt.hashpw(request.password(), BCrypt.gensalt())
+        );
         user.persist();
 
         return Response.ok().build();
