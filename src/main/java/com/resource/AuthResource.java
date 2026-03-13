@@ -46,7 +46,6 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-
         //todo new method in AuthService to generate a session token
         byte[] randombytes = new byte[32];
         new SecureRandom().nextBytes(randombytes);
