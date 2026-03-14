@@ -47,6 +47,7 @@ public class AuthResource {
         }
 
         //todo new method in AuthService to generate a session token
+        //todo store hashed token in database (also will need to hash before query in current-user route)
         byte[] randombytes = new byte[32];
         new SecureRandom().nextBytes(randombytes);
         final String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randombytes);
@@ -110,6 +111,7 @@ public class AuthResource {
     @Transactional
     public Response createUser(final UserCreateRequest request) {
         //todo make a UserService to handle user crud ops
+        //todo refactor to enforce unique usernames
         User user = new User(
             request.username(),
             BCrypt.hashpw(request.password(), BCrypt.gensalt())
@@ -130,7 +132,7 @@ public class AuthResource {
                 .domain(domain)
                 .httpOnly(true)
                 .secure(secure_cookie)
-                .sameSite(NewCookie.SameSite.NONE)
+                .sameSite(NewCookie.SameSite.NONE) //todo SameSite.LAX
                 .maxAge(0)
                 .build();
 
