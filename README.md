@@ -8,11 +8,7 @@ This project is a full-stack web application that allows users to track and cate
 
 ## Tech Stack
 
-### Frontend
-- React (Vite)
-- Tailwind CSS
-
-### Backend
+### API
 - Java
 - Quarkus
 - PostgreSQL
