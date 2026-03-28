@@ -59,18 +59,23 @@ public class AuthResource {
     @GET
     @Path("/current-user")
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     public Response getCurrentUser(@CookieParam("budget_session") final String sessionToken) {
         if (sessionToken == null || sessionToken.isBlank()) {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+            return authService.generateUnauthorizedResponse();
         }
 
         Session session = Session.find("token", sessionToken).firstResult();
-        if (session == null || session.getExpires().isBefore(Instant.now())) {
-            final NewCookie deleteCookie = authService.generateDeleteCookie();
-            return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
+        if (session == null) {
+            return authService.generateUnauthorizedResponse();
         }
 
-        String username = session.getUser().getUsername();
+        if (session.getExpires().isBefore(Instant.now())) {
+            session.delete();
+            return authService.generateUnauthorizedResponse();
+        }
+
+        final String username = session.getUser().getUsername();
         return Response.ok(Map.of(
             "username", username
         )).build();

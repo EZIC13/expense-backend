@@ -2,6 +2,7 @@ package com.service;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.NewCookie;
+import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.security.SecureRandom;
@@ -50,5 +51,10 @@ public class AuthService {
             .sameSite(sameSite)
             .maxAge(0)
             .build();
+    }
+
+    public Response generateUnauthorizedResponse() {
+        final NewCookie deleteCookie = this.generateDeleteCookie();
+        return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
     }
 }
