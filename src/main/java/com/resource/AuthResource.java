@@ -4,6 +4,8 @@ import com.model.LoginRequest;
 import com.model.Session;
 import com.model.User;
 import com.model.UserCreateRequest;
+import com.service.AuthService;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
@@ -14,22 +16,16 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.mindrot.jbcrypt.BCrypt;
-import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Map;
 
 @Path("/auth")
 public class AuthResource {
 
-    @ConfigProperty(name = "api_env")
-    String api_env;
-
-    @ConfigProperty(name = "domain")
-    String domain;
+    @Inject
+    AuthService authService;
 
     @POST
     @Path("/login")
@@ -46,60 +42,31 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        //todo new method in AuthService to generate a session token
-        //todo store hashed token in database (also will need to hash before query in current-user route)
-        byte[] randombytes = new byte[32];
-        new SecureRandom().nextBytes(randombytes);
-        final String token = Base64.getUrlEncoder().withoutPadding().encodeToString(randombytes);
+        //todo hash the session token before storing in the database (also will need to hash before query in current-user route)
+        final String sessionToken = authService.generateSessionToken();
 
-        //todo make an AuthService to handle session crud ops
         Session session = new Session(
-            token,
+            sessionToken,
             Instant.now().plus(1, ChronoUnit.DAYS),
             user
         );
         session.persist();
 
-        //todo this will also be in AuthService
-        boolean isSecureCookie = !api_env.equals("dev");
-        NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
-
-        NewCookie cookie = new NewCookie.Builder("budget_session")
-            .value(token)
-            .path("/")
-            .domain(domain)
-            .httpOnly(true)
-            .secure(isSecureCookie)
-            .sameSite(sameSite)
-            .maxAge(24 * 60 * 60) //one day
-            .build();
-
-        return Response.ok().cookie(cookie).build();
+        final NewCookie sessionCookie = authService.generateSessionCookie(sessionToken);
+        return Response.ok().cookie(sessionCookie).build();
     }
 
     @GET
     @Path("/current-user")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCurrentUser(@CookieParam("budget_session") String token) {
-        if (token == null || token.isBlank()) {
+    public Response getCurrentUser(@CookieParam("budget_session") final String sessionToken) {
+        if (sessionToken == null || sessionToken.isBlank()) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        Session session = Session.find("token", token).firstResult();
+        Session session = Session.find("token", sessionToken).firstResult();
         if (session == null || session.getExpires().isBefore(Instant.now())) {
-            boolean isSecureCookie = !api_env.equals("dev");
-            NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
-
-            NewCookie deleteCookie = new NewCookie.Builder("budget_session")
-                    .value("")
-                    .path("/")
-                    .domain(domain)
-                    .httpOnly(true)
-                    .secure(isSecureCookie)
-                    .sameSite(sameSite)
-                    .maxAge(0)
-                    .build();
-
+            final NewCookie deleteCookie = authService.generateDeleteCookie();
             return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
         }
 
@@ -114,7 +81,6 @@ public class AuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createUser(final UserCreateRequest request) {
-        //todo make a UserService to handle user crud ops
         //todo refactor to enforce unique usernames
         User user = new User(
             request.username(),
@@ -128,27 +94,15 @@ public class AuthResource {
     @POST
     @Path("/logout")
     @Transactional
-    public Response logoutUser(@CookieParam("budget_session") String token) {
-        boolean isSecureCookie = !api_env.equals("dev");
-        NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
-
-        NewCookie deleteCookie = new NewCookie.Builder("budget_session")
-                .value("")
-                .path("/")
-                .domain(domain)
-                .httpOnly(true)
-                .secure(isSecureCookie)
-                .sameSite(sameSite)
-                .maxAge(0)
-                .build();
-
-        if (token != null) {
-            Session session = Session.find("token", token).firstResult();
+    public Response logoutUser(@CookieParam("budget_session") final String sessionToken) {
+        if (sessionToken != null) {
+            Session session = Session.find("token", sessionToken).firstResult();
             if (session != null) {
                 session.delete();
             }
         }
 
+        final NewCookie deleteCookie = authService.generateDeleteCookie();
         return Response.ok().cookie(deleteCookie).build();
     }
 }
