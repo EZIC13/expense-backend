@@ -31,7 +31,6 @@ Authentication is implemented using server-side sessions. Current authentication
 
 Planned authentication improvements include:
 - Hashing of session tokens (SHA-256 or stronger)
-- Tightening of cross-site request logic
 - Deletion of expired session tokens from the database
 
 Some of these improvements are noted with `// TODO` comments in the codebase. This README will be updated as development progresses.

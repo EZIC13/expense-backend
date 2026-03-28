@@ -61,14 +61,16 @@ public class AuthResource {
         session.persist();
 
         //todo this will also be in AuthService
-        boolean secure_cookie = !api_env.equals("dev");
+        boolean isSecureCookie = !api_env.equals("dev");
+        NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
+
         NewCookie cookie = new NewCookie.Builder("budget_session")
             .value(token)
             .path("/")
             .domain(domain)
             .httpOnly(true)
-            .secure(secure_cookie)
-            .sameSite(NewCookie.SameSite.NONE)
+            .secure(isSecureCookie)
+            .sameSite(sameSite)
             .maxAge(24 * 60 * 60) //one day
             .build();
 
@@ -85,14 +87,16 @@ public class AuthResource {
 
         Session session = Session.find("token", token).firstResult();
         if (session == null || session.getExpires().isBefore(Instant.now())) {
-            boolean secure_cookie = !api_env.equals("dev");
+            boolean isSecureCookie = !api_env.equals("dev");
+            NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
+
             NewCookie deleteCookie = new NewCookie.Builder("budget_session")
                     .value("")
                     .path("/")
                     .domain(domain)
                     .httpOnly(true)
-                    .secure(secure_cookie)
-                    .sameSite(NewCookie.SameSite.NONE)
+                    .secure(isSecureCookie)
+                    .sameSite(sameSite)
                     .maxAge(0)
                     .build();
 
@@ -125,14 +129,16 @@ public class AuthResource {
     @Path("/logout")
     @Transactional
     public Response logoutUser(@CookieParam("budget_session") String token) {
-        boolean secure_cookie = !api_env.equals("dev");
+        boolean isSecureCookie = !api_env.equals("dev");
+        NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
+
         NewCookie deleteCookie = new NewCookie.Builder("budget_session")
                 .value("")
                 .path("/")
                 .domain(domain)
                 .httpOnly(true)
-                .secure(secure_cookie)
-                .sameSite(NewCookie.SameSite.NONE) //todo SameSite.LAX
+                .secure(isSecureCookie)
+                .sameSite(sameSite)
                 .maxAge(0)
                 .build();
 
