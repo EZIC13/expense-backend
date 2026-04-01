@@ -29,9 +29,7 @@ Authentication is implemented using server-side sessions. Current authentication
 - Tokens are stored in the database with an expiration timestamp
 - Cookies are marked `Secure` in production with `HttpOnly`, and share the same expiration as the session tokens
 - Session tokens are hashed (SHA-256) in the database
-
-Planned authentication improvements include:
-- Automatic deletion of expired session tokens from the database
+- Backend cleanup job to clear expired session tokens every 30 minutes
 
 Some of these improvements are noted with `// TODO` comments in the codebase. This README will be updated as development progresses.
 

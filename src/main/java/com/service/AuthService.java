@@ -1,6 +1,9 @@
 package com.service;
 
+import com.model.Session;
+import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
@@ -8,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Base64;
 
 @ApplicationScoped
@@ -68,5 +72,11 @@ public class AuthService {
     public Response generateUnauthorizedResponse() {
         final NewCookie deleteCookie = this.generateDeleteCookie();
         return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
+    }
+
+    @Scheduled(every = "30m")
+    @Transactional
+    void deleteExpiredSessions() {
+        Session.delete("expires < ?1", Instant.now());
     }
 }
