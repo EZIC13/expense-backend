@@ -42,12 +42,12 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        //todo hash the session token before storing in the database (also will need to hash before query in current-user route)
         final String sessionToken = authService.generateSessionToken();
+        final String hashedSessionToken = authService.hashSessionToken(sessionToken);
 
         Session session = new Session(
-            sessionToken,
-            Instant.now().plus(1, ChronoUnit.DAYS),
+            hashedSessionToken,
+            Instant.now().plus(8, ChronoUnit.HOURS),
             user
         );
         session.persist();
@@ -65,7 +65,8 @@ public class AuthResource {
             return authService.generateUnauthorizedResponse();
         }
 
-        Session session = Session.find("token", sessionToken).firstResult();
+        final String hashedSessionToken = authService.hashSessionToken(sessionToken);
+        Session session = Session.find("token", hashedSessionToken).firstResult();
         if (session == null) {
             return authService.generateUnauthorizedResponse();
         }
@@ -93,6 +94,8 @@ public class AuthResource {
         );
         user.persist();
 
+        //todo log-in user
+
         return Response.ok().build();
     }
 
@@ -101,7 +104,8 @@ public class AuthResource {
     @Transactional
     public Response logoutUser(@CookieParam("budget_session") final String sessionToken) {
         if (sessionToken != null) {
-            Session session = Session.find("token", sessionToken).firstResult();
+            final String hashedSessionToken = authService.hashSessionToken(sessionToken);
+            Session session = Session.find("token", hashedSessionToken).firstResult();
             if (session != null) {
                 session.delete();
             }
