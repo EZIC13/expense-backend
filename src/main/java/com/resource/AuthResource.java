@@ -76,7 +76,13 @@ public class AuthResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createUser(final UserCreateRequest request) {
-        //todo refactor to enforce unique usernames
+        final String username = request.username();
+        final User existingUser = User.find("username", username).firstResult();
+
+        if (existingUser != null) {
+            return Response.status(Response.Status.CONFLICT).build();
+        }
+
         User user = new User(
             request.username(),
             BCrypt.hashpw(request.password(), BCrypt.gensalt())

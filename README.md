@@ -31,7 +31,7 @@ Authentication is implemented using server-side sessions. Current authentication
 - Session tokens are hashed (SHA-256) in the database
 - Backend cleanup job to clear expired session tokens every 30 minutes
 
-Some of these improvements are noted with `// TODO` comments in the codebase. This README will be updated as development progresses.
+[//]: # (Some of these improvements are noted with `// TODO` comments in the codebase. This README will be updated as development progresses.)
 
 ## Running Locally
 Run the development server using Quarkus: `./mvnw quarkus:dev`
