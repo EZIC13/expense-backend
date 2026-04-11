@@ -18,7 +18,6 @@ import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.mindrot.jbcrypt.BCrypt;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 @Path("/auth")
@@ -42,17 +41,7 @@ public class AuthResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        final String sessionToken = authService.generateSessionToken();
-        final String hashedSessionToken = authService.hashSessionToken(sessionToken);
-
-        Session session = new Session(
-            hashedSessionToken,
-            Instant.now().plus(8, ChronoUnit.HOURS),
-            user
-        );
-        session.persist();
-
-        final NewCookie sessionCookie = authService.generateSessionCookie(sessionToken);
+        final NewCookie sessionCookie = authService.loginUserAndReturnCookie(user);
         return Response.ok().cookie(sessionCookie).build();
     }
 
@@ -94,9 +83,8 @@ public class AuthResource {
         );
         user.persist();
 
-        //todo log-in user
-
-        return Response.ok().build();
+        final NewCookie sessionCookie = authService.loginUserAndReturnCookie(user);
+        return Response.ok().cookie(sessionCookie).build();
     }
 
     @POST

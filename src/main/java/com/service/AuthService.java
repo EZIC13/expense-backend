@@ -1,6 +1,7 @@
 package com.service;
 
 import com.model.Session;
+import com.model.User;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 
 @ApplicationScoped
@@ -67,6 +69,20 @@ public class AuthService {
             .sameSite(sameSite)
             .maxAge(0)
             .build();
+    }
+
+    public NewCookie loginUserAndReturnCookie(final User user) {
+        final String sessionToken = this.generateSessionToken();
+        final String hashedSessionToken = this.hashSessionToken(sessionToken);
+
+        Session session = new Session(
+            hashedSessionToken,
+            Instant.now().plus(8, ChronoUnit.HOURS),
+            user
+        );
+        session.persist();
+
+        return this.generateSessionCookie(sessionToken);
     }
 
     public Response generateUnauthorizedResponse() {
