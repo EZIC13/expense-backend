@@ -13,3 +13,6 @@ CREATE TABLE IF NOT EXISTS sessions (
     expires TIMESTAMP NOT NULL,
     user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Insert test user (test/test)
+INSERT INTO users (id, username, password) VALUES ('32da5c15-4b87-43cd-b5a2-af19102e6354', 'test', '$2a$10$xJcZl1Tur1ms9OenFitwf.X6xbI/B/FhCSWNW.Za8GV0DiU.Hwgb.');
