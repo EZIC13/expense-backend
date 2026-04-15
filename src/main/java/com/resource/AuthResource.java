@@ -17,7 +17,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 import org.mindrot.jbcrypt.BCrypt;
-import java.time.Instant;
 import java.util.Map;
 
 @Path("/auth")
@@ -54,20 +53,13 @@ public class AuthResource {
             return authService.generateUnauthorizedResponse();
         }
 
-        final String hashedSessionToken = authService.hashSessionToken(sessionToken);
-        Session session = Session.find("token", hashedSessionToken).firstResult();
-        if (session == null) {
+        final User user = authService.getUserFromSessionToken(sessionToken);
+        if (user == null) {
             return authService.generateUnauthorizedResponse();
         }
 
-        if (session.getExpires().isBefore(Instant.now())) {
-            session.delete();
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final String username = session.getUser().getUsername();
         return Response.ok(Map.of(
-            "username", username
+            "username", user.getUsername()
         )).build();
     }
 

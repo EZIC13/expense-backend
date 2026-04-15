@@ -90,6 +90,22 @@ public class AuthService {
         return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
     }
 
+    public User getUserFromSessionToken(final String sessionToken) {
+        final String hashedSessionToken = this.hashSessionToken(sessionToken);
+        Session session = Session.find("token", hashedSessionToken).firstResult();
+
+        if (session == null) {
+            return null;
+        }
+
+        if (session.getExpires().isBefore(Instant.now())) {
+            session.delete();
+            return null;
+        }
+
+        return session.getUser();
+    }
+
     @Scheduled(every = "30m")
     @Transactional
     void deleteExpiredSessions() {
