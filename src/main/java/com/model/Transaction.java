@@ -21,21 +21,33 @@ public class Transaction extends PanacheEntityBase {
     @Column(name = "merchant")
     private String merchant;
 
+    @Column(name = "category")
+    private String category;
+
+    @Column(name = "amount")
+    private int amount;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     public Transaction() {}
 
-    public Transaction(String merchant, User user) {
+    public Transaction(String merchant, String category, int amount, User user) {
         this.merchant = merchant;
+        this.category = category;
+        this.amount = amount;
         this.user = user;
     }
 
     public String getId() { return id; }
     public String getMerchant() { return merchant; }
+    public String getCategory() { return category; }
+    public int getAmount() { return amount; }
     public User getUser() { return user; }
 
     public void setMerchant(String merchant) { this.merchant = merchant; }
+    public void setCategory(String category) { this.category = category; }
+    public void setAmount(int amount) { this.amount = amount; }
     public void setUser(User user) { this.user = user; }
 }

@@ -39,17 +39,14 @@ public class TransactionResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (transactionRequest.merchant() == null || transactionRequest.merchant().isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        Transaction newTransaction = new Transaction(
-                transactionRequest.merchant(),
-                user
+        final Transaction newTransaction = new Transaction(
+            transactionRequest.merchant(),
+            transactionRequest.category(),
+            transactionRequest.amount(),
+            user
         );
         newTransaction.persist();
 
         return Response.status(Response.Status.CREATED).build();
     }
-
 }
