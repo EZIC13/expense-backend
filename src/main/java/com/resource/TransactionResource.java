@@ -26,7 +26,6 @@ public class TransactionResource {
     AuthService authService;
 
     @POST
-    @Path("/create-transaction")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     public Response createTransaction(@CookieParam("budget_session") final String sessionToken, final CreateTransactionRequest transactionRequest) {
