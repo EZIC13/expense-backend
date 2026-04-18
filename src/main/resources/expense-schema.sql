@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     id VARCHAR(255) PRIMARY KEY UNIQUE,
     merchant VARCHAR(255) NOT NULL,
     category VARCHAR(255) NOT NULL,
+    is_income BOOLEAN NOT NULL DEFAULT FALSE,
     amount_in_cents INTEGER NOT NULL,
     transaction_date DATE NOT NULL,
     user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE

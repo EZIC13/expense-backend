@@ -51,6 +51,7 @@ public class TransactionResource {
         final Transaction newTransaction = new Transaction(
             transactionRequest.merchant(),
             transactionRequest.category(),
+            transactionRequest.isIncome(),
             transactionRequest.amountInCents(),
             transactionDate,
             user

@@ -25,6 +25,9 @@ public class Transaction extends PanacheEntityBase {
     @Column(name = "category")
     private String category;
 
+    @Column(name = "is_income")
+    private boolean isIncome;
+
     @Column(name = "amount_in_cents")
     private int amountInCents;
 
@@ -37,9 +40,10 @@ public class Transaction extends PanacheEntityBase {
 
     public Transaction() {}
 
-    public Transaction(String merchant, String category, int amountInCents, LocalDate transactionDate, User user) {
+    public Transaction(String merchant, String category, boolean isIncome, int amountInCents, LocalDate transactionDate, User user) {
         this.merchant = merchant;
         this.category = category;
+        this.isIncome = isIncome;
         this.amountInCents = amountInCents;
         this.transactionDate = transactionDate;
         this.user = user;
@@ -48,13 +52,15 @@ public class Transaction extends PanacheEntityBase {
     public String getId() { return id; }
     public String getMerchant() { return merchant; }
     public String getCategory() { return category; }
+    public boolean getIsIncome() { return isIncome; }
     public int getAmountInCents() { return amountInCents; }
     public LocalDate getTransactionDate() { return transactionDate; }
     public User getUser() { return user; }
 
     public void setMerchant(String merchant) { this.merchant = merchant; }
     public void setCategory(String category) { this.category = category; }
+    public void setIsIncome(boolean isIncome) { this.isIncome = isIncome; }
     public void setAmountInCents(int amountInCents) { this.amountInCents = amountInCents; }
-    public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = this.transactionDate; }
+    public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = transactionDate; }
     public void setUser(User user) { this.user = user; }
 }
