@@ -13,6 +13,8 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @Path("/transactions")
 public class TransactionResource {
@@ -39,10 +41,18 @@ public class TransactionResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        final LocalDate transactionDate;
+        try {
+            transactionDate = LocalDate.parse(transactionRequest.date());
+        } catch (DateTimeParseException | NullPointerException e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
         final Transaction newTransaction = new Transaction(
             transactionRequest.merchant(),
             transactionRequest.category(),
             transactionRequest.amount(),
+            transactionDate,
             user
         );
         newTransaction.persist();

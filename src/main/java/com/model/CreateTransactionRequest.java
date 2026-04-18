@@ -3,5 +3,6 @@ package com.model;
 public record CreateTransactionRequest (
     String merchant,
     String category,
-    int amount
+    int amount,
+    String date
 ) {}

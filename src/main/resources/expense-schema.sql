@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS transactions (
     merchant VARCHAR(255) NOT NULL,
     category VARCHAR(255) NOT NULL,
     amount INTEGER NOT NULL,
+    date DATE NOT NULL,
     user_id VARCHAR(255) REFERENCES users(id) ON DELETE CASCADE
 );
 
