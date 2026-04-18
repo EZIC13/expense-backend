@@ -25,11 +25,11 @@ public class Transaction extends PanacheEntityBase {
     @Column(name = "category")
     private String category;
 
-    @Column(name = "amount")
-    private int amount;
+    @Column(name = "amount_in_cents")
+    private int amountInCents;
 
-    @Column(name = "date")
-    private LocalDate date;
+    @Column(name = "transaction_date")
+    private LocalDate transactionDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -37,24 +37,24 @@ public class Transaction extends PanacheEntityBase {
 
     public Transaction() {}
 
-    public Transaction(String merchant, String category, int amount, LocalDate date, User user) {
+    public Transaction(String merchant, String category, int amountInCents, LocalDate transactionDate, User user) {
         this.merchant = merchant;
         this.category = category;
-        this.amount = amount;
-        this.date = date;
+        this.amountInCents = amountInCents;
+        this.transactionDate = transactionDate;
         this.user = user;
     }
 
     public String getId() { return id; }
     public String getMerchant() { return merchant; }
     public String getCategory() { return category; }
-    public int getAmount() { return amount; }
-    public LocalDate getDate() { return date; }
+    public int getAmountInCents() { return amountInCents; }
+    public LocalDate getTransactionDate() { return transactionDate; }
     public User getUser() { return user; }
 
     public void setMerchant(String merchant) { this.merchant = merchant; }
     public void setCategory(String category) { this.category = category; }
-    public void setAmount(int amount) { this.amount = amount; }
-    public void setDate(LocalDate date) { this.date = date; }
+    public void setAmountInCents(int amountInCents) { this.amountInCents = amountInCents; }
+    public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = this.transactionDate; }
     public void setUser(User user) { this.user = user; }
 }

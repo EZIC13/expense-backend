@@ -43,7 +43,7 @@ public class TransactionResource {
 
         final LocalDate transactionDate;
         try {
-            transactionDate = LocalDate.parse(transactionRequest.date());
+            transactionDate = LocalDate.parse(transactionRequest.transactionDate());
         } catch (DateTimeParseException | NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -51,7 +51,7 @@ public class TransactionResource {
         final Transaction newTransaction = new Transaction(
             transactionRequest.merchant(),
             transactionRequest.category(),
-            transactionRequest.amount(),
+            transactionRequest.amountInCents(),
             transactionDate,
             user
         );
