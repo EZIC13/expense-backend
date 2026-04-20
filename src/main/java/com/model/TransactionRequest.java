@@ -1,6 +1,6 @@
 package com.model;
 
-public record CreateTransactionRequest (
+public record TransactionRequest(
     String merchant,
     String category,
     boolean isIncome,

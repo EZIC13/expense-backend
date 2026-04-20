@@ -19,8 +19,10 @@ This project is a full-stack web application that allows users to track and cate
 - GitHub Actions
 
 ## Current Features
-Authentication is the primary focus of the current development stage.
-Expense tracking endpoints and related functionality will be added next.
+- Creation of new transactions
+- Editing of existing transactions
+- Retrieval of all transactions
+- Isolating data returned by authenticated user
 
 ### Authentication
 Authentication is implemented using server-side sessions. Current authentication features include:
