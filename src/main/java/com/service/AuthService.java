@@ -92,13 +92,13 @@ public class AuthService {
 
     public User getUserFromSessionToken(final String sessionToken) {
         final String hashedSessionToken = this.hashSessionToken(sessionToken);
-        Session session = Session.find("token", hashedSessionToken).firstResult();
+        Session session = Session.find("session_token", hashedSessionToken).firstResult();
 
         if (session == null) {
             return null;
         }
 
-        if (session.getExpires().isBefore(Instant.now())) {
+        if (session.getSessionExpiry().isBefore(Instant.now())) {
             session.delete();
             return null;
         }
@@ -109,6 +109,6 @@ public class AuthService {
     @Scheduled(every = "30m")
     @Transactional
     void deleteExpiredSessions() {
-        Session.delete("expires < ?1", Instant.now());
+        Session.delete("session_expiry < ?1", Instant.now());
     }
 }

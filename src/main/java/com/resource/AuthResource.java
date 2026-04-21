@@ -91,7 +91,7 @@ public class AuthResource {
     public Response logoutUser(@CookieParam("budget_session") final String sessionToken) {
         if (sessionToken != null) {
             final String hashedSessionToken = authService.hashSessionToken(sessionToken);
-            Session session = Session.find("token", hashedSessionToken).firstResult();
+            Session session = Session.find("session_token", hashedSessionToken).firstResult();
             if (session != null) {
                 session.delete();
             }

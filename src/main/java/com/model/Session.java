@@ -20,11 +20,11 @@ public class Session extends PanacheEntityBase {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "token")
-    private String token;
+    @Column(name = "session_token")
+    private String session_token;
 
-    @Column(name = "expires")
-    private Instant expires;
+    @Column(name = "session_expiry")
+    private Instant session_expiry;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -32,18 +32,18 @@ public class Session extends PanacheEntityBase {
 
     public Session() {}
 
-    public Session(String token, Instant expires, User user) {
-        this.token = token;
-        this.expires = expires;
+    public Session(String session_token, Instant expires, User user) {
+        this.session_token = session_token;
+        this.session_expiry = expires;
         this.user = user;
     }
 
     public String getId() { return id; }
-    public String getToken() { return token; }
-    public Instant getExpires() { return expires; }
+    public String getToken() { return session_token; }
+    public Instant getSessionExpiry() { return session_expiry; }
     public User getUser() { return user; }
 
-    public void setToken(String token) { this.token = token; }
-    public void setExpires(Instant expires) { this.expires = expires; }
+    public void setSessionToken(String session_token) { this.session_token = session_token; }
+    public void setSessionExpiry(Instant session_expiry) { this.session_expiry = session_expiry; }
     public void setUser(User user) { this.user = user; }
 }
