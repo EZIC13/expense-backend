@@ -12,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "transactions")
+@Table(name = "transactions", schema = "expense")
 public class Transaction extends PanacheEntityBase {
 
     @Id

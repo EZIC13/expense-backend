@@ -12,7 +12,7 @@ import jakarta.persistence.JoinColumn;
 import java.time.Instant;
 
 @Entity
-@Table(name = "sessions")
+@Table(name = "sessions", schema = "auth")
 public class Session extends PanacheEntityBase {
 
     @Id
