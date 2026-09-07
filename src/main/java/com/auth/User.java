@@ -1,5 +1,6 @@
 package com.auth;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -17,10 +18,11 @@ public class User extends PanacheEntityBase {
     public String id;
 
     @Column(name = "username")
-    private String username;
+    public String username;
 
+    @JsonIgnore
     @Column(name = "password")
-    private String password;
+    public String password;
 
     public User() {}
 
@@ -28,11 +30,4 @@ public class User extends PanacheEntityBase {
         this.username = username;
         this.password = password;
     }
-
-    public String getId() { return id; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-
-    public void setUsername(String username) { this.username = username; }
-    public void setPassword(String password) { this.password = password; }
 }

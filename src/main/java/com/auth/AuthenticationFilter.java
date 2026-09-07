@@ -42,6 +42,6 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             return;
         }
 
-        currentUser.set(user.getId(), user.getUsername());
+        currentUser.set(user.id, user.username);
     }
 }

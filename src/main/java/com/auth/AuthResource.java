@@ -27,14 +27,14 @@ public class AuthResource {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response loginUser(final LoginRequest request) {
+    public Response loginUser(final Login request) {
         User user = User.find("username", request.username()).firstResult();
 
         if (user == null) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
-        if (!BCrypt.checkpw(request.password(), user.getPassword())) {
+        if (!BCrypt.checkpw(request.password(), user.password)) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
@@ -56,7 +56,7 @@ public class AuthResource {
     @Path("/create-user")
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response createUser(final UserCreateRequest request) {
+    public Response createUser(final UserCreate request) {
         final String username = request.username();
         final User existingUser = User.find("username", username).firstResult();
 
@@ -80,7 +80,7 @@ public class AuthResource {
     public Response logoutUser(@CookieParam("budget_session") final String sessionToken) {
         if (sessionToken != null) {
             final String hashedSessionToken = authService.hashSessionToken(sessionToken);
-            Session session = Session.find("session_token", hashedSessionToken).firstResult();
+            Session session = Session.find("sessionToken", hashedSessionToken).firstResult();
             if (session != null) {
                 session.delete();
             }

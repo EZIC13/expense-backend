@@ -1,6 +1,6 @@
 package com.auth;
 
-public record LoginRequest (
+public record UserCreate(
     String username,
     String password
 ) {}
