@@ -1,63 +1,41 @@
 package com.expense;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions", schema = "expense")
+@JsonIgnoreProperties(value = "userId", allowGetters = false, allowSetters = false)
 public class Transaction extends PanacheEntityBase {
 
+    /** Client-supplied. The backend stores it as given and rejects a duplicate with 409. */
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     public String id;
 
     @Column(name = "merchant")
-    private String merchant;
+    public String merchant;
 
     @Column(name = "category")
-    private String category;
+    public String category;
 
     @Column(name = "is_income")
-    private boolean isIncome;
+    public boolean isIncome;
 
     @Column(name = "amount_in_cents")
-    private int amountInCents;
+    public int amountInCents;
 
     @Column(name = "transaction_date")
-    private LocalDate transactionDate;
+    public LocalDate transactionDate;
 
+    /** Server-controlled: set from the authenticated session, never read from the request body. */
+    @JsonIgnore
     @Column(name = "user_id")
-    private String userId;
-
-    public Transaction() {}
-
-    public Transaction(String merchant, String category, boolean isIncome, int amountInCents, LocalDate transactionDate, String userId) {
-        this.merchant = merchant;
-        this.category = category;
-        this.isIncome = isIncome;
-        this.amountInCents = amountInCents;
-        this.transactionDate = transactionDate;
-        this.userId = userId;
-    }
-
-    public String getId() { return id; }
-    public String getMerchant() { return merchant; }
-    public String getCategory() { return category; }
-    public boolean getIsIncome() { return isIncome; }
-    public int getAmountInCents() { return amountInCents; }
-    public LocalDate getTransactionDate() { return transactionDate; }
-    public String getUserId() { return userId; }
-
-    public void setMerchant(String merchant) { this.merchant = merchant; }
-    public void setCategory(String category) { this.category = category; }
-    public void setIsIncome(boolean isIncome) { this.isIncome = isIncome; }
-    public void setAmountInCents(int amountInCents) { this.amountInCents = amountInCents; }
-    public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = transactionDate; }
-    public void setUserId(String userId) { this.userId = userId; }
+    public String userId;
 }
