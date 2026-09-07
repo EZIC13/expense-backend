@@ -1,4 +1,4 @@
-package com.model;
+package com.expense;
 
 public record TransactionRequest(
     String merchant,

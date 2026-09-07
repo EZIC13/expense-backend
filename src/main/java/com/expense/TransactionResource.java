@@ -1,11 +1,7 @@
-package com.resource;
+package com.expense;
 
-import com.model.TransactionRequest;
-import com.model.Transaction;
-import com.model.TransactionResponse;
-import com.model.User;
-import com.security.Authenticated;
-import com.security.CurrentUser;
+import com.auth.Authenticated;
+import com.auth.CurrentUser;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Path;
@@ -44,15 +40,13 @@ public class TransactionResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        final User user = User.findById(currentUser.getId());
-
         final Transaction newTransaction = new Transaction(
             transactionRequest.merchant(),
             transactionRequest.category(),
             transactionRequest.isIncome(),
             transactionRequest.amountInCents(),
             transactionDate,
-            user
+            currentUser.getId()
         );
         newTransaction.persist();
 
@@ -63,7 +57,7 @@ public class TransactionResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response getAllTransactions() {
-        final List<Transaction> transactions = Transaction.list("user.id = ?1 order by transactionDate desc", currentUser.getId());
+        final List<Transaction> transactions = Transaction.list("userId = ?1 order by transactionDate desc", currentUser.getId());
 
         final List<TransactionResponse> response = transactions.stream()
             .map(transaction -> new TransactionResponse(
@@ -84,7 +78,7 @@ public class TransactionResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response getTransaction(@PathParam("id") final String transactionId) {
-        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
+        final Transaction transaction = Transaction.find("id = ?1 and userId = ?2", transactionId, currentUser.getId()).firstResult();
 
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -108,7 +102,7 @@ public class TransactionResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     public Response editTransaction(@PathParam("id") final String transactionId, final TransactionRequest transactionRequest) {
-        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
+        final Transaction transaction = Transaction.find("id = ?1 and userId = ?2", transactionId, currentUser.getId()).firstResult();
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -133,7 +127,7 @@ public class TransactionResource {
     @Path("/{id}")
     @Transactional
     public Response deleteTransaction(@PathParam("id") final String transactionId) {
-        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
+        final Transaction transaction = Transaction.find("id = ?1 and userId = ?2", transactionId, currentUser.getId()).firstResult();
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

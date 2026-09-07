@@ -1,4 +1,4 @@
-package com.model;
+package com.auth;
 
 public record UserCreateRequest (
     String username,

@@ -1,7 +1,5 @@
-package com.security;
+package com.auth;
 
-import com.model.User;
-import com.service.AuthService;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

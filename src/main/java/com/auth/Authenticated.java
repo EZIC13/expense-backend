@@ -1,4 +1,4 @@
-package com.security;
+package com.auth;
 
 import jakarta.ws.rs.NameBinding;
 import java.lang.annotation.ElementType;

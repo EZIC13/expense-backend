@@ -1,12 +1,5 @@
-package com.resource;
+package com.auth;
 
-import com.model.LoginRequest;
-import com.model.Session;
-import com.model.User;
-import com.model.UserCreateRequest;
-import com.security.Authenticated;
-import com.security.CurrentUser;
-import com.service.AuthService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;

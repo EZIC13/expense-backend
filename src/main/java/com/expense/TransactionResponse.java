@@ -1,4 +1,4 @@
-package com.model;
+package com.expense;
 
 import java.time.LocalDate;
 

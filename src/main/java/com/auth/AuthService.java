@@ -1,7 +1,5 @@
-package com.service;
+package com.auth;
 
-import com.model.Session;
-import com.model.User;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;

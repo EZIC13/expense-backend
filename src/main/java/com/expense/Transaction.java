@@ -1,4 +1,4 @@
-package com.model;
+package com.expense;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
@@ -7,8 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.JoinColumn;
 import java.time.LocalDate;
 
 @Entity
@@ -34,19 +32,18 @@ public class Transaction extends PanacheEntityBase {
     @Column(name = "transaction_date")
     private LocalDate transactionDate;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private String userId;
 
     public Transaction() {}
 
-    public Transaction(String merchant, String category, boolean isIncome, int amountInCents, LocalDate transactionDate, User user) {
+    public Transaction(String merchant, String category, boolean isIncome, int amountInCents, LocalDate transactionDate, String userId) {
         this.merchant = merchant;
         this.category = category;
         this.isIncome = isIncome;
         this.amountInCents = amountInCents;
         this.transactionDate = transactionDate;
-        this.user = user;
+        this.userId = userId;
     }
 
     public String getId() { return id; }
@@ -55,12 +52,12 @@ public class Transaction extends PanacheEntityBase {
     public boolean getIsIncome() { return isIncome; }
     public int getAmountInCents() { return amountInCents; }
     public LocalDate getTransactionDate() { return transactionDate; }
-    public User getUser() { return user; }
+    public String getUserId() { return userId; }
 
     public void setMerchant(String merchant) { this.merchant = merchant; }
     public void setCategory(String category) { this.category = category; }
     public void setIsIncome(boolean isIncome) { this.isIncome = isIncome; }
     public void setAmountInCents(int amountInCents) { this.amountInCents = amountInCents; }
     public void setTransactionDate(LocalDate transactionDate) { this.transactionDate = transactionDate; }
-    public void setUser(User user) { this.user = user; }
+    public void setUserId(String userId) { this.userId = userId; }
 }

@@ -1,4 +1,4 @@
-package com.security;
+package com.auth;
 
 import jakarta.enterprise.context.RequestScoped;
 
