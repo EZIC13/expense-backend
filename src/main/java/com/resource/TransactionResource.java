@@ -4,7 +4,8 @@ import com.model.TransactionRequest;
 import com.model.Transaction;
 import com.model.TransactionResponse;
 import com.model.User;
-import com.service.AuthService;
+import com.security.Authenticated;
+import com.security.CurrentUser;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Path;
@@ -14,7 +15,6 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -23,24 +23,16 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @Path("/transactions")
+@Authenticated
 public class TransactionResource {
 
     @Inject
-    AuthService authService;
+    CurrentUser currentUser;
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response createTransaction(@CookieParam("budget_session") final String sessionToken, final TransactionRequest transactionRequest) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
+    public Response createTransaction(final TransactionRequest transactionRequest) {
         if (transactionRequest == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -51,6 +43,8 @@ public class TransactionResource {
         } catch (DateTimeParseException | NullPointerException e) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
+
+        final User user = User.findById(currentUser.getId());
 
         final Transaction newTransaction = new Transaction(
             transactionRequest.merchant(),
@@ -68,17 +62,8 @@ public class TransactionResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response getAllTransactions(@CookieParam("budget_session") final String sessionToken) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final List<Transaction> transactions = Transaction.list("user = ?1 order by transactionDate desc", user);
+    public Response getAllTransactions() {
+        final List<Transaction> transactions = Transaction.list("user.id = ?1 order by transactionDate desc", currentUser.getId());
 
         final List<TransactionResponse> response = transactions.stream()
             .map(transaction -> new TransactionResponse(
@@ -98,17 +83,8 @@ public class TransactionResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response getTransaction(@CookieParam("budget_session") final String sessionToken, @PathParam("id") final String transactionId) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final Transaction transaction = Transaction.find("id = ?1 and user = ?2", transactionId, user).firstResult();
+    public Response getTransaction(@PathParam("id") final String transactionId) {
+        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
 
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -131,17 +107,8 @@ public class TransactionResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response editTransaction(@CookieParam("budget_session") final String sessionToken, @PathParam("id") final String transactionId, final TransactionRequest transactionRequest) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final Transaction transaction = Transaction.find("id = ?1 and user = ?2", transactionId, user).firstResult();
+    public Response editTransaction(@PathParam("id") final String transactionId, final TransactionRequest transactionRequest) {
+        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -165,17 +132,8 @@ public class TransactionResource {
     @DELETE
     @Path("/{id}")
     @Transactional
-    public Response deleteTransaction(@CookieParam("budget_session") final String sessionToken, @PathParam("id") final String transactionId) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final Transaction transaction = Transaction.find("id = ?1 and user = ?2", transactionId, user).firstResult();
+    public Response deleteTransaction(@PathParam("id") final String transactionId) {
+        final Transaction transaction = Transaction.find("id = ?1 and user.id = ?2", transactionId, currentUser.getId()).firstResult();
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }

@@ -4,6 +4,8 @@ import com.model.LoginRequest;
 import com.model.Session;
 import com.model.User;
 import com.model.UserCreateRequest;
+import com.security.Authenticated;
+import com.security.CurrentUser;
 import com.service.AuthService;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,9 @@ public class AuthResource {
 
     @Inject
     AuthService authService;
+
+    @Inject
+    CurrentUser currentUser;
 
     @POST
     @Path("/login")
@@ -47,19 +52,10 @@ public class AuthResource {
     @GET
     @Path("/current-user")
     @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    public Response getCurrentUser(@CookieParam("budget_session") final String sessionToken) {
-        if (sessionToken == null || sessionToken.isBlank()) {
-            return authService.generateUnauthorizedResponse();
-        }
-
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
-            return authService.generateUnauthorizedResponse();
-        }
-
+    @Authenticated
+    public Response getCurrentUser() {
         return Response.ok(Map.of(
-            "username", user.getUsername()
+            "username", currentUser.getUsername()
         )).build();
     }
 
