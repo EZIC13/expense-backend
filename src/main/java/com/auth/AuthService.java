@@ -41,7 +41,6 @@ public class AuthService {
 
     public NewCookie generateSessionCookie(final String sessionToken) {
         final boolean isSecureCookie = !api_env.equals("dev");
-        final NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
 
         return new NewCookie.Builder("budget_session")
             .value(sessionToken)
@@ -49,14 +48,13 @@ public class AuthService {
             .domain(domain)
             .httpOnly(true)
             .secure(isSecureCookie)
-            .sameSite(sameSite)
+            .sameSite(NewCookie.SameSite.LAX)
             .maxAge(8 * 60 * 60) //8 hours
             .build();
     }
 
     public NewCookie generateDeleteCookie() {
         final boolean isSecureCookie = !api_env.equals("dev");
-        final NewCookie.SameSite sameSite = api_env.equals("dev") ? NewCookie.SameSite.NONE : NewCookie.SameSite.LAX;
 
         return new NewCookie.Builder("budget_session")
             .value("")
@@ -64,7 +62,7 @@ public class AuthService {
             .domain(domain)
             .httpOnly(true)
             .secure(isSecureCookie)
-            .sameSite(sameSite)
+            .sameSite(NewCookie.SameSite.LAX)
             .maxAge(0)
             .build();
     }
