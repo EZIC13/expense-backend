@@ -74,7 +74,7 @@ public class AuthService {
         Session session = new Session(
             hashedSessionToken,
             Instant.now().plus(8, ChronoUnit.HOURS),
-            user
+            user.id
         );
         session.persist();
 
@@ -86,7 +86,7 @@ public class AuthService {
         return Response.status(Response.Status.UNAUTHORIZED).cookie(deleteCookie).build();
     }
 
-    public User getUserFromSessionToken(final String sessionToken) {
+    public String getUserIdFromSessionToken(final String sessionToken) {
         final String hashedSessionToken = this.hashSessionToken(sessionToken);
         Session session = Session.find("sessionToken", hashedSessionToken).firstResult();
 
@@ -99,7 +99,7 @@ public class AuthService {
             return null;
         }
 
-        return session.user;
+        return session.userId;
     }
 
     @Scheduled(every = "30m")

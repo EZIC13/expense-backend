@@ -1,7 +1,5 @@
 package com.expense;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,10 +9,8 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "transactions", schema = "expense")
-@JsonIgnoreProperties(value = "userId", allowGetters = false, allowSetters = false)
 public class Transaction extends PanacheEntityBase {
 
-    /** Client-supplied. The backend stores it as given and rejects a duplicate with 409. */
     @Id
     @Column(name = "id")
     public String id;
@@ -34,8 +30,18 @@ public class Transaction extends PanacheEntityBase {
     @Column(name = "transaction_date")
     public LocalDate transactionDate;
 
-    /** Server-controlled: set from the authenticated session, never read from the request body. */
-    @JsonIgnore
     @Column(name = "user_id")
     public String userId;
+
+    public Transaction() {}
+
+    public Transaction(String id, String merchant, String category, boolean isIncome, int amountInCents, LocalDate transactionDate, String userId) {
+        this.id = id;
+        this.merchant = merchant;
+        this.category = category;
+        this.isIncome = isIncome;
+        this.amountInCents = amountInCents;
+        this.transactionDate = transactionDate;
+        this.userId = userId;
+    }
 }

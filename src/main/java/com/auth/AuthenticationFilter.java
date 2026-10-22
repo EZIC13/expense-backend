@@ -36,12 +36,12 @@ public class AuthenticationFilter implements ContainerRequestFilter {
             return;
         }
 
-        final User user = authService.getUserFromSessionToken(sessionToken);
-        if (user == null) {
+        final String userId = authService.getUserIdFromSessionToken(sessionToken);
+        if (userId == null) {
             requestContext.abortWith(authService.generateUnauthorizedResponse());
             return;
         }
 
-        currentUser.set(user.id, user.username);
+        currentUser.set(userId);
     }
 }

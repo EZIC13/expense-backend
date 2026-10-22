@@ -47,9 +47,8 @@ public class AuthResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Authenticated
     public Response getCurrentUser() {
-        return Response.ok(Map.of(
-            "username", currentUser.getUsername()
-        )).build();
+        final User user = User.findById(currentUser.getId());
+        return Response.ok(Map.of("username", user.username)).build();
     }
 
     @POST

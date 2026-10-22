@@ -27,26 +27,36 @@ public class TransactionResource {
 
     @POST
     @Transactional
-    public Response createTransaction(final Transaction transaction) {
-        if (transaction == null || transaction.id == null || transaction.id.isBlank()) {
+    public Response createTransaction(final TransactionDto transactionDto) {
+        if (transactionDto == null || transactionDto.id() == null || transactionDto.id().isBlank()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (Transaction.findById(transaction.id) != null) {
+        if (Transaction.findById(transactionDto.id()) != null) {
             return Response.status(Response.Status.CONFLICT).build();
         }
 
-        transaction.userId = currentUser.getId();
+        final Transaction transaction = new Transaction(
+            transactionDto.id(),
+            transactionDto.merchant(),
+            transactionDto.category(),
+            transactionDto.isIncome(),
+            transactionDto.amountInCents(),
+            transactionDto.transactionDate(),
+            currentUser.getId()
+        );
+
         transaction.persist();
 
-        return Response.status(Response.Status.CREATED).entity(transaction).build();
+        return Response.status(Response.Status.CREATED).entity(TransactionDto.from(transaction)).build();
     }
 
     @GET
     @Transactional
     public Response getAllTransactions() {
         final List<Transaction> transactions = Transaction.list("userId = ?1 order by transactionDate desc", currentUser.getId());
-        return Response.ok(transactions).build();
+        final List<TransactionDto> transactionDtos = transactions.stream().map(TransactionDto::from).toList();
+        return Response.ok(transactionDtos).build();
     }
 
     @GET
@@ -59,26 +69,26 @@ public class TransactionResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        return Response.ok(transaction).build();
+        return Response.ok(TransactionDto.from(transaction)).build();
     }
 
     @PUT
     @Path("/{id}")
     @Transactional
-    public Response editTransaction(@PathParam("id") final String transactionId, final Transaction updatedTransaction) {
+    public Response editTransaction(@PathParam("id") final String transactionId, final TransactionDto transactionDto) {
         final Transaction transaction = Transaction.find("id = ?1 and userId = ?2", transactionId, currentUser.getId()).firstResult();
 
         if (transaction == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        transaction.merchant = updatedTransaction.merchant;
-        transaction.category = updatedTransaction.category;
-        transaction.isIncome = updatedTransaction.isIncome;
-        transaction.amountInCents = updatedTransaction.amountInCents;
-        transaction.transactionDate = updatedTransaction.transactionDate;
+        transaction.merchant = transactionDto.merchant();
+        transaction.category = transactionDto.category();
+        transaction.isIncome = transactionDto.isIncome();
+        transaction.amountInCents = transactionDto.amountInCents();
+        transaction.transactionDate = transactionDto.transactionDate();
 
-        return Response.ok(transaction).build();
+        return Response.ok(TransactionDto.from(transaction)).build();
     }
 
     @DELETE

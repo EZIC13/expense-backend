@@ -11,18 +11,12 @@ import jakarta.enterprise.context.RequestScoped;
 public class CurrentUser {
 
     private String id;
-    private String username;
 
     public String getId() {
         return id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    void set(final String id, final String username) {
+    void set(final String id) {
         this.id = id;
-        this.username = username;
     }
 }
